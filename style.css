@@ -1,0 +1,366 @@
+:root {
+    --red: #c62828;
+    --red-dark: #a91f24;
+    --red-light: #fff0f0;
+    --text: #242424;
+    --muted: #858585;
+    --background: #f6f6f8;
+    --white: #ffffff;
+    --border: #eeeeef;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+button {
+    font: inherit;
+}
+
+.app {
+    width: 100%;
+    max-width: 520px;
+    min-height: 100vh;
+    margin: 0 auto;
+    padding-bottom: 94px;
+    background: var(--background);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.brand-logo {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    background: var(--red);
+    color: white;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.brand-name {
+    font-size: 15px;
+    font-weight: 850;
+    letter-spacing: .3px;
+}
+
+.brand-subtitle {
+    margin-top: 3px;
+    color: var(--red);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 1.3px;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--red-light);
+    color: var(--red);
+    font-weight: 800;
+}
+
+main {
+    padding: 20px 16px;
+}
+
+.welcome {
+    margin-bottom: 19px;
+}
+
+.muted,
+.card-caption {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+}
+
+.welcome h1 {
+    margin: 8px 0;
+    font-size: 25px;
+    letter-spacing: -.7px;
+}
+
+.welcome p:last-child {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.income-card {
+    padding: 22px 19px;
+    border-radius: 21px;
+    background: linear-gradient(145deg, #c62828, #a91f24);
+    color: white;
+    box-shadow: 0 9px 24px rgba(198, 40, 40, .16);
+}
+
+.card-caption {
+    color: #ffe1e1;
+}
+
+.income {
+    margin-top: 12px;
+    font-size: 37px;
+    font-weight: 850;
+    letter-spacing: -1px;
+}
+
+.income-note {
+    margin-top: 5px;
+    color: #ffe1e1;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.plan-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+    font-size: 12px;
+}
+
+.progress {
+    height: 6px;
+    margin-top: 10px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .28);
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: white;
+}
+
+.plan-note {
+    margin-top: 9px;
+    color: #ffe1e1;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.section {
+    margin-top: 26px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 13px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+}
+
+.action {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 76px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--white);
+    color: var(--text);
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .15s, border-color .15s;
+}
+
+.action:active {
+    transform: scale(.98);
+}
+
+.action-icon {
+    display: grid;
+    flex: 0 0 37px;
+    place-items: center;
+    width: 37px;
+    height: 37px;
+    border-radius: 12px;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.red {
+    background: #ffebeb;
+    color: var(--red);
+}
+
+.pink {
+    background: #fff0f5;
+    color: #c34470;
+}
+
+.gray {
+    background: #f0f0f3;
+    color: #525262;
+}
+
+.gold {
+    background: #fff4d9;
+    color: #b47b00;
+}
+
+.counter {
+    display: grid;
+    place-items: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #eeeeef;
+    color: #555;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.empty-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 17px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--white);
+    text-align: center;
+}
+
+.empty-icon {
+    display: grid;
+    place-items: center;
+    width: 47px;
+    height: 47px;
+    margin-bottom: 13px;
+    border-radius: 15px;
+    background: var(--red-light);
+    color: var(--red);
+    font-size: 24px;
+}
+
+.empty-card strong {
+    font-size: 13px;
+}
+
+.empty-card p {
+    max-width: 260px;
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.notice {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 20px;
+    padding: 14px;
+    border: 1px solid #f1dddd;
+    border-radius: 13px;
+    background: #fffafa;
+    color: #6e5555;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.bottom-nav {
+    position: fixed;
+    z-index: 10;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-around;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border);
+    background: rgba(255, 255, 255, .97);
+}
+
+.nav-item {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    border: none;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+}
+
+.nav-item span {
+    font-size: 23px;
+    line-height: 25px;
+}
+
+.nav-item small {
+    font-size: 10px;
+    font-weight: 650;
+}
+
+.nav-item.active {
+    color: var(--red);
+}
+
+@media (min-width: 600px) {
+    .app {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        min-height: calc(100vh - 40px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        overflow: hidden;
+    }
+
+    .bottom-nav {
+        bottom: 20px;
+        border: 1px solid var(--border);
+        border-radius: 0 0 24px 24px;
+    }
+}
+

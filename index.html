@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#c62828">
+    <title>Территория недвижимости</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-logo">Т</div>
+                <div>
+                    <div class="brand-name">ТЕРРИТОРИЯ</div>
+                    <div class="brand-subtitle">НЕДВИЖИМОСТИ</div>
+                </div>
+            </div>
+            <div class="avatar">Г</div>
+        </header>
+
+        <main>
+            <section class="welcome">
+                <p class="muted">ЛИЧНЫЙ КАБИНЕТ</p>
+                <h1>Добро пожаловать!</h1>
+                <p>Твой рабочий центр в одном месте.</p>
+            </section>
+
+            <section class="income-card">
+                <div class="card-caption">МОЙ РЕЗУЛЬТАТ ЗА МЕСЯЦ</div>
+                <div class="income">0 ₽</div>
+                <div class="income-note">Начисления появятся после подключения данных</div>
+
+                <div class="plan-row">
+                    <span>Выполнение плана</span>
+                    <strong>0%</strong>
+                </div>
+                <div class="progress">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="plan-note">0 ₽ из 200 000 ₽ — демонстрационные значения</div>
+            </section>
+
+            <section class="section">
+                <div class="section-heading">
+                    <h2>Быстрые действия</h2>
+                </div>
+
+                <div class="actions">
+                    <button class="action" data-action="deal">
+                        <span class="action-icon red">＋</span>
+                        <span>Новая сделка</span>
+                    </button>
+                    <button class="action" data-action="deposits">
+                        <span class="action-icon pink">₽</span>
+                        <span>Задатки</span>
+                    </button>
+                    <button class="action" data-action="results">
+                        <span class="action-icon gray">▥</span>
+                        <span>Мои результаты</span>
+                    </button>
+                    <button class="action" data-action="rating">
+                        <span class="action-icon gold">★</span>
+                        <span>Рейтинг агентов</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-heading">
+                    <h2>Мои сделки</h2>
+                    <span class="counter">0</span>
+                </div>
+                <div class="empty-card">
+                    <div class="empty-icon">▤</div>
+                    <strong>Здесь появятся твои сделки</strong>
+                    <p>После подключения бота увидишь суммы, адреса и статусы.</p>
+                </div>
+            </section>
+
+            <div class="notice">
+                <span>🔴</span>
+                <span>Территория недвижимости — работаем на результат.</span>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="home">
+                <span>⌂</span><small>Главная</small>
+            </button>
+            <button class="nav-item" data-tab="deals">
+                <span>▤</span><small>Сделки</small>
+            </button>
+            <button class="nav-item" data-tab="rating">
+                <span>★</span><small>Рейтинг</small>
+            </button>
+            <button class="nav-item" data-tab="profile">
+                <span>●</span><small>Профиль</small>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
