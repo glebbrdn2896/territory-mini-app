@@ -1,4 +1,3 @@
-alert("JavaScript Территории недвижимости запустился");
 document.addEventListener("DOMContentLoaded", async () => {
     const API_URL =
         "https://authentic-animated-fan-camcorder.trycloudflare.com";
