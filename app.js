@@ -588,11 +588,366 @@ document.addEventListener("DOMContentLoaded", async () => {
     // КНОПКИ РАЗДЕЛОВ
     // ========================================================
 
-    const actionMessages = {
-        deposits: "Раздел задатков подключим следующим этапом.",
-        results: "Подробную статистику подключим следующим этапом.",
-        rating: "Рейтинг агентов подключим следующим этапом."
-    };
+// ========================================================
+// ЗАДАТКИ: ФОРМА, СПИСОК И ПОДТВЕРЖДЕНИЕ
+// ========================================================
+
+async function openDepositsSection() {
+    try {
+        const data = await apiFetch("/api/deposits");
+        const deposits = data.deposits || [];
+        const isManager = Boolean(data.is_manager);
+
+        installDealFormStyles();
+
+        const backdrop = document.createElement("div");
+        backdrop.className = "deal-modal-backdrop";
+
+        backdrop.innerHTML = `
+            <section class="deal-modal" role="dialog" aria-modal="true">
+                <h2>💰 Задатки</h2>
+                <p class="deal-description">
+                    Подтверждённые задатки доступны всем агентам.
+                    Твои заявки на проверке также будут отображаться здесь.
+                </p>
+
+                <button type="button" class="deal-submit"
+                    id="deposit-new-button"
+                    style="width:100%;min-height:46px;border:0;border-radius:10px">
+                    + Новый задаток
+                </button>
+
+                <div id="deposit-list" style="margin-top:16px"></div>
+
+                <div class="deal-form-actions">
+                    <button type="button" class="deal-cancel"
+                        id="deposit-close-button">Закрыть</button>
+                </div>
+            </section>
+        `;
+
+        document.body.appendChild(backdrop);
+
+        const list = backdrop.querySelector("#deposit-list");
+
+        function addText(parent, text, tag = "p") {
+            const element = document.createElement(tag);
+            element.textContent = text;
+            parent.appendChild(element);
+            return element;
+        }
+
+        function close() {
+            backdrop.remove();
+            document.removeEventListener("keydown", onEscape);
+        }
+
+        function onEscape(event) {
+            if (event.key === "Escape") close();
+        }
+
+        backdrop.querySelector("#deposit-close-button")
+            .addEventListener("click", close);
+
+        backdrop.addEventListener("click", (event) => {
+            if (event.target === backdrop) close();
+        });
+
+        document.addEventListener("keydown", onEscape);
+
+        function renderDeposits() {
+            list.replaceChildren();
+
+            if (!deposits.length) {
+                addText(list, "Задатков пока нет.");
+                return;
+            }
+
+            deposits.forEach((deposit) => {
+                const card = document.createElement("div");
+                card.className = "empty-card";
+                card.style.marginTop = "12px";
+
+                addText(card, `Задаток №${deposit.id}`, "strong");
+                addText(card, `Объект: ${deposit.object_address}`);
+                addText(card, `Агент: ${deposit.agent_name}`);
+                addText(card, `Покупатель: ${deposit.buyer_full_name || "—"}`);
+                addText(card, `Телефон: ${deposit.buyer_phone || "—"}`);
+                addText(card, `Сумма задатка: ${money(deposit.deposit_amount)}`);
+                addText(card, `Дата оплаты: ${deposit.paid_at || "—"}`);
+                addText(
+                    card,
+                    `Окончание: ${deposit.expires_at
+                        ? deposit.expires_at.slice(0, 10)
+                        : "—"}`
+                );
+                addText(card, `Статус: ${deposit.status}`);
+
+                if (deposit.comment) {
+                    addText(card, `Комментарий: ${deposit.comment}`);
+                }
+
+                if (deposit.rejection_reason) {
+                    addText(
+                        card,
+                        `Причина отклонения: ${deposit.rejection_reason}`
+                    );
+                }
+
+                if (isManager && deposit.status === "НА ПОДТВЕРЖДЕНИИ") {
+                    const actions = document.createElement("div");
+                    actions.className = "deal-form-actions";
+
+                    const approve = document.createElement("button");
+                    approve.className = "deal-submit";
+                    approve.textContent = "Подтвердить";
+
+                    const reject = document.createElement("button");
+                    reject.className = "deal-cancel";
+                    reject.textContent = "Отклонить";
+
+                    approve.addEventListener("click", async () => {
+                        await reviewDeposit(deposit.id, "approve");
+                    });
+
+                    reject.addEventListener("click", async () => {
+                        const reason = prompt(
+                            "Укажи причину отклонения заявки:"
+                        );
+
+                        if (reason === null) return;
+
+                        if (!reason.trim()) {
+                            alert("Нужно указать причину отклонения.");
+                            return;
+                        }
+
+                        await reviewDeposit(
+                            deposit.id,
+                            "reject",
+                            reason.trim()
+                        );
+                    });
+
+                    actions.append(approve, reject);
+                    card.appendChild(actions);
+                }
+
+                list.appendChild(card);
+            });
+        }
+
+        async function reviewDeposit(id, action, rejectionReason = "") {
+            try {
+                const result = await apiFetch(
+                    `/api/deposits/${id}/review`,
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            action,
+                            rejection_reason: rejectionReason
+                        })
+                    }
+                );
+
+                const index = deposits.findIndex(
+                    (item) => item.id === id
+                );
+
+                if (index !== -1) {
+                    deposits[index] = result.deposit;
+                }
+
+                renderDeposits();
+
+                alert(
+                    action === "approve"
+                        ? "Задаток подтверждён."
+                        : "Заявка отклонена."
+                );
+
+                await loadData();
+
+            } catch (error) {
+                alert(`Не удалось обработать заявку: ${error.message}`);
+            }
+        }
+
+        backdrop.querySelector("#deposit-new-button")
+            .addEventListener("click", () => {
+                openNewDepositForm(backdrop, close);
+            });
+
+        renderDeposits();
+
+    } catch (error) {
+        alert(`Не удалось загрузить задатки: ${error.message}`);
+    }
+}
+
+
+async function openNewDepositForm(parentBackdrop, closeParent) {
+    const backdrop = document.createElement("div");
+    backdrop.className = "deal-modal-backdrop";
+    backdrop.style.zIndex = "10001";
+
+    const today = new Date();
+    const todayString = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")
+    ].join("-");
+
+    backdrop.innerHTML = `
+        <section class="deal-modal" role="dialog" aria-modal="true">
+            <h2>Новый задаток</h2>
+            <p class="deal-description">
+                После отправки заявка поступит руководителю на проверку.
+            </p>
+
+            <form id="new-deposit-form">
+                <label for="dep-address">Адрес объекта *</label>
+                <input id="dep-address" required minlength="3"
+                    maxlength="500" placeholder="Адрес объекта">
+
+                <label for="dep-buyer">ФИО покупателя *</label>
+                <input id="dep-buyer" required minlength="2"
+                    maxlength="200" placeholder="Фамилия Имя Отчество">
+
+                <label for="dep-phone">Телефон покупателя *</label>
+                <input id="dep-phone" type="tel" required minlength="5"
+                    maxlength="50" placeholder="+7...">
+
+                <label for="dep-amount">Сумма задатка, ₽ *</label>
+                <input id="dep-amount" type="number" required min="0.01"
+                    max="1000000000" step="0.01" placeholder="Например, 100000">
+
+                <label for="dep-paid">Дата внесения задатка *</label>
+                <input id="dep-paid" type="date" required value="${todayString}">
+
+                <label for="dep-expires">Дата окончания задатка *</label>
+                <input id="dep-expires" type="date" required>
+
+                <label for="dep-type">Вид объекта</label>
+                <select id="dep-type">
+                    <option value="Квартира">Квартира</option>
+                    <option value="Дом">Дом</option>
+                    <option value="Земельный участок">Земельный участок</option>
+                    <option value="Коммерческая недвижимость">Коммерческая недвижимость</option>
+                    <option value="Новостройка">Новостройка</option>
+                    <option value="Другое">Другое</option>
+                </select>
+
+                <label for="dep-comment">Комментарий</label>
+                <input id="dep-comment" maxlength="2000"
+                    placeholder="Дополнительная информация">
+
+                <div id="dep-error" class="deal-form-error" role="alert"></div>
+
+                <div class="deal-form-actions">
+                    <button type="button" class="deal-cancel"
+                        id="dep-cancel">Отмена</button>
+                    <button type="submit" class="deal-submit"
+                        id="dep-submit">Отправить заявку</button>
+                </div>
+            </form>
+        </section>
+    `;
+
+    document.body.appendChild(backdrop);
+
+    const form = backdrop.querySelector("#new-deposit-form");
+    const errorElement = backdrop.querySelector("#dep-error");
+    const submitButton = backdrop.querySelector("#dep-submit");
+    const cancelButton = backdrop.querySelector("#dep-cancel");
+
+    function closeForm() {
+        backdrop.remove();
+    }
+
+    cancelButton.addEventListener("click", closeForm);
+
+    backdrop.addEventListener("click", (event) => {
+        if (event.target === backdrop) closeForm();
+    });
+
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorElement.textContent = "";
+
+        const paidAt = backdrop.querySelector("#dep-paid").value;
+        const expiresAt = backdrop.querySelector("#dep-expires").value;
+        const amount = Number(
+            backdrop.querySelector("#dep-amount").value
+        );
+
+        if (!paidAt || !expiresAt) {
+            errorElement.textContent = "Заполни обе даты.";
+            return;
+        }
+
+        if (expiresAt < paidAt) {
+            errorElement.textContent =
+                "Дата окончания не может быть раньше даты оплаты.";
+            return;
+        }
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            errorElement.textContent = "Укажи корректную сумму задатка.";
+            return;
+        }
+
+        const requestData = {
+            object_address: backdrop.querySelector("#dep-address").value.trim(),
+            buyer_full_name: backdrop.querySelector("#dep-buyer").value.trim(),
+            buyer_phone: backdrop.querySelector("#dep-phone").value.trim(),
+            deposit_amount: amount,
+            paid_at: paidAt,
+            expires_at: expiresAt,
+            comment: backdrop.querySelector("#dep-comment").value.trim(),
+            object_type: backdrop.querySelector("#dep-type").value,
+            commission: 0,
+            calculation_type: "Не указан"
+        };
+
+        submitButton.disabled = true;
+        cancelButton.disabled = true;
+        submitButton.textContent = "Отправляем...";
+
+        try {
+            const result = await apiFetch("/api/deposits", {
+                method: "POST",
+                body: JSON.stringify(requestData)
+            });
+
+            backdrop.remove();
+            closeParent();
+
+            alert(
+                `Заявка на задаток №${result.deposit_id} отправлена.\n` +
+                `Статус: ${result.status}.\n` +
+                (
+                    result.notification_sent
+                        ? "Руководитель уведомлён."
+                        : "Заявка сохранена, но уведомление руководителю не отправлено."
+                )
+            );
+
+            await loadData();
+
+        } catch (error) {
+            errorElement.textContent = error.message;
+            submitButton.disabled = false;
+            cancelButton.disabled = false;
+            submitButton.textContent = "Отправить заявку";
+        }
+    });
+}
+
+const actionMessages = {
+    results: "Подробную статистику подключим следующим этапом.",
+    rating: "Рейтинг агентов подключим следующим этапом."
+};
 
     document.querySelectorAll("[data-action]").forEach((button) => {
         button.addEventListener("click", async () => {
@@ -602,6 +957,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await openDealForm();
                 return;
             }
+if (action === "deposits") {
+    await openDepositsSection();
+    return;
+}
 
             alert(
                 actionMessages[action] ||
