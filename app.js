@@ -1,4 +1,3 @@
-```javascript
 document.addEventListener("DOMContentLoaded", async () => {
     const API_URL =
         "https://authentic-animated-fan-camcorder.trycloudflare.com";
@@ -242,4 +241,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await loadData();
 });
-```
