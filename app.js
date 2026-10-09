@@ -1,41 +1,86 @@
+
 document.addEventListener("DOMContentLoaded", () => {
+    const telegram = window.Telegram?.WebApp;
+
+    const statusElement = document.getElementById("connection-status");
+    const welcomeTitle = document.getElementById("welcome-title");
+    const avatar = document.getElementById("avatar");
+
+    // Инициализация Mini App внутри Telegram
+    if (telegram) {
+        telegram.ready();
+        telegram.expand();
+
+        const user = telegram.initDataUnsafe?.user;
+
+        if (user) {
+            const firstName = user.first_name || "Сотрудник";
+            welcomeTitle.textContent = `Привет, ${firstName}!`;
+
+            const initials = [
+                user.first_name,
+                user.last_name
+            ]
+                .filter(Boolean)
+                .map(name => name[0])
+                .join("");
+
+            avatar.textContent = initials || "Т";
+
+            statusElement.textContent =
+                telegram.initData
+                    ? "Telegram подключён"
+                    : "Ожидается авторизация Telegram";
+        } else {
+            statusElement.textContent =
+                "Открой приложение через Telegram";
+        }
+    } else {
+        statusElement.textContent =
+            "Открой приложение внутри Telegram";
+    }
+
     const actionMessages = {
         deal: "Создание сделки подключим следующим этапом.",
         deposits: "Раздел задатков подключим следующим этапом.",
         results: "Здесь появятся твои реальные результаты.",
-        rating: "Рейтинг агентов подключим к данным бота."
+        rating: "Рейтинг агентов подключим следующим этапом."
     };
 
-    document.querySelectorAll("[data-action]").forEach((button) => {
+    document.querySelectorAll("[data-action]").forEach(button => {
         button.addEventListener("click", () => {
             const action = button.dataset.action;
-            alert(actionMessages[action] || "Раздел пока в разработке.");
+            alert(actionMessages[action] || "Раздел в разработке.");
         });
     });
 
-    document.querySelectorAll("[data-tab]").forEach((button) => {
+    const tabNames = {
+        home: "Главная",
+        deals: "Сделки",
+        rating: "Рейтинг",
+        profile: "Профиль"
+    };
+
+    document.querySelectorAll("[data-tab]").forEach(button => {
         button.addEventListener("click", () => {
-            document.querySelectorAll("[data-tab]").forEach((item) => {
+            document.querySelectorAll("[data-tab]").forEach(item => {
                 item.classList.remove("active");
             });
 
             button.classList.add("active");
 
-            const tabNames = {
-                home: "Главная",
-                deals: "Сделки",
-                rating: "Рейтинг",
-                profile: "Профиль"
-            };
+            const tab = button.dataset.tab;
 
-            if (button.dataset.tab !== "home") {
+            if (tab === "deals") {
+                document.getElementById("deals-section")
+                    ?.scrollIntoView({ behavior: "smooth" });
+            } else if (tab !== "home") {
                 alert(
-                    "Раздел «" +
-                    tabNames[button.dataset.tab] +
-                    "» подключим следующим этапом."
+                    `Раздел «${tabNames[tab] || tab}» подключим следующим этапом.`
                 );
+            } else {
+                window.scrollTo({ top: 0, behavior: "smooth" });
             }
         });
     });
 });
-
