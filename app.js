@@ -85,14 +85,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "Статус: " +
                 (statusLabels[deal.status] || deal.status || "Не указан");
 
-            const payout = document.createElement("p");
-            payout.textContent = "Моё начисление: " + money(deal.payout);
+            const commission = document.createElement("p");
+            commission.textContent =
+                "Комиссия: " + money(deal.commission);
 
-            card.append(title, status, payout);
+            card.append(title, status, commission);
+
+            if (deal.is_joint_deal) {
+                const joint = document.createElement("p");
+                joint.textContent =
+                    "Совместная сделка — показана половина комиссии";
+                card.appendChild(joint);
+            }
 
             if (deal.deal_date) {
                 const date = document.createElement("p");
-                date.textContent = "Дата: " + deal.deal_date;
+                date.textContent =
+                    "Дата: " + deal.deal_date.slice(0, 10);
                 card.appendChild(date);
             }
 
@@ -121,7 +130,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    throw new Error("Не удалось проверить авторизацию Telegram");
+                    throw new Error(
+                        "Не удалось проверить авторизацию Telegram"
+                    );
                 }
 
                 if (response.status === 403) {
@@ -150,6 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             avatar.textContent = initials || "Т";
 
             const now = new Date();
+
             const currentMonth =
                 `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
@@ -162,34 +174,45 @@ document.addEventListener("DOMContentLoaded", async () => {
                     .startsWith(currentMonth)
             );
 
+            // Берём комиссию, подготовленную API:
+            // полную для обычной сделки и половину для совместной.
             const monthlyIncome = monthlyDeals.reduce(
-                (sum, deal) => sum + (Number(deal.payout) || 0),
+                (sum, deal) =>
+                    sum + (Number(deal.commission) || 0),
                 0
             );
 
             const plan = Number(employee.monthly_plan) || 0;
+
             const percent = plan > 0
                 ? Math.round(monthlyIncome / plan * 100)
                 : 0;
 
             incomeElement.textContent = money(monthlyIncome);
+
             incomeNote.textContent =
-                "По подтверждённым сделкам за текущий месяц";
+                "Комиссия по подтверждённым сделкам за текущий месяц";
 
             planPercent.textContent = `${percent}%`;
-            progressFill.style.width = `${Math.min(percent, 100)}%`;
+
+            progressFill.style.width =
+                `${Math.min(percent, 100)}%`;
 
             planNote.textContent = plan > 0
                 ? `${money(monthlyIncome)} из ${money(plan)}`
                 : "Месячный план не установлен в базе";
 
-            statusElement.textContent = "Данные загружены из БотСделка";
+            statusElement.textContent =
+                "Данные загружены из БотСделка";
 
             renderDeals(deals);
+
         } catch (error) {
             console.error("Ошибка загрузки данных:", error);
 
-            statusElement.textContent = "Не удалось загрузить данные";
+            statusElement.textContent =
+                "Не удалось загрузить данные";
+
             incomeElement.textContent = "—";
             incomeNote.textContent = error.message;
             planPercent.textContent = "—";
