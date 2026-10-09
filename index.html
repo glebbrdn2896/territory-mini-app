@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,6 +7,7 @@
     <meta name="theme-color" content="#c62828">
     <title>Территория недвижимости</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="app">
@@ -17,29 +19,36 @@
                     <div class="brand-subtitle">НЕДВИЖИМОСТИ</div>
                 </div>
             </div>
-            <div class="avatar">Г</div>
+            <div class="avatar" id="avatar">Т</div>
         </header>
 
         <main>
             <section class="welcome">
                 <p class="muted">ЛИЧНЫЙ КАБИНЕТ</p>
-                <h1>Добро пожаловать!</h1>
+                <h1 id="welcome-title">Добро пожаловать!</h1>
                 <p>Твой рабочий центр в одном месте.</p>
+                <p id="connection-status" class="muted">
+                    Подготовка приложения...
+                </p>
             </section>
 
             <section class="income-card">
                 <div class="card-caption">МОЙ РЕЗУЛЬТАТ ЗА МЕСЯЦ</div>
-                <div class="income">0 ₽</div>
-                <div class="income-note">Начисления появятся после подключения данных</div>
+                <div class="income" id="income">0 ₽</div>
+                <div class="income-note" id="income-note">
+                    Ожидается подключение данных
+                </div>
 
                 <div class="plan-row">
                     <span>Выполнение плана</span>
-                    <strong>0%</strong>
+                    <strong id="plan-percent">0%</strong>
                 </div>
                 <div class="progress">
-                    <div class="progress-fill"></div>
+                    <div class="progress-fill" id="progress-fill"></div>
                 </div>
-                <div class="plan-note">0 ₽ из 200 000 ₽ — демонстрационные значения</div>
+                <div class="plan-note" id="plan-note">
+                    Данные о плане пока не загружены
+                </div>
             </section>
 
             <section class="section">
@@ -67,15 +76,17 @@
                 </div>
             </section>
 
-            <section class="section">
+            <section class="section" id="deals-section">
                 <div class="section-heading">
                     <h2>Мои сделки</h2>
-                    <span class="counter">0</span>
+                    <span class="counter" id="deals-count">0</span>
                 </div>
-                <div class="empty-card">
-                    <div class="empty-icon">▤</div>
-                    <strong>Здесь появятся твои сделки</strong>
-                    <p>После подключения бота увидишь суммы, адреса и статусы.</p>
+                <div id="deals-list">
+                    <div class="empty-card">
+                        <div class="empty-icon">▤</div>
+                        <strong>Сделки пока не загружены</strong>
+                        <p>После подключения API здесь появятся твои сделки.</p>
+                    </div>
                 </div>
             </section>
 
