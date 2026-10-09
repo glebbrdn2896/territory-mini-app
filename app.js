@@ -161,14 +161,11 @@ async function loadData() {
 
         avatar.textContent = initials || "Т";
 
-        // Определяем текущий месяц по локальной дате устройства.
         const now = new Date();
 
         const currentMonth =
             `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
-        // В месячный результат идут только подтверждённые
-        // и выплаченные сделки.
         const completedDeals = deals.filter((deal) =>
             ["approved", "paid"].includes(deal.status)
         );
@@ -181,8 +178,9 @@ async function loadData() {
             return date.startsWith(currentMonth);
         });
 
-        // Для обычной сделки берём всю комиссию.
-        // Для совместной API уже должен передать половину.
+        // Обычная сделка: вся комиссия.
+        // Совместная сделка: половина комиссии участнику.
+        // Значение commission рассчитывает API.
         const monthlyIncome = monthlyDeals.reduce(
             (sum, deal) =>
                 sum + (Number(deal.commission) || 0),
@@ -197,21 +195,8 @@ async function loadData() {
 
         incomeElement.textContent = money(monthlyIncome);
 
-        // ВРЕМЕННАЯ ДИАГНОСТИКА.
-        // Показывает, на каком этапе теряется сумма.
-        const allCommission = deals.reduce(
-            (sum, deal) =>
-                sum + (Number(deal.commission) || 0),
-            0
-        );
-
         incomeNote.textContent =
-            `Диагностика: месяц ${currentMonth}; ` +
-            `всего сделок ${deals.length}; ` +
-            `подтверждено ${completedDeals.length}; ` +
-            `за месяц ${monthlyDeals.length}; ` +
-            `комиссия всех сделок ${money(allCommission)}; ` +
-            `комиссия за месяц ${money(monthlyIncome)}`;
+            "Комиссия по подтверждённым сделкам за текущий месяц";
 
         planPercent.textContent = `${percent}%`;
 
